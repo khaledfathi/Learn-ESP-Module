@@ -7,8 +7,8 @@
  *	Functions
  */
 
-#include "CPU_CONFIG.h"
 #include "applib.h"
+#include "MCU_Config.h"
 
 
 Uint32t expo (Uint8t base , Uint8t power){
@@ -18,8 +18,6 @@ Uint32t expo (Uint8t base , Uint8t power){
 	}
 	return res;
 }
-
-//convert integer to string
 Uint8t* int2str (Uint32t org_num){
 	//counting digits
 	Uint32t num = org_num ;

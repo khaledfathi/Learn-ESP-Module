@@ -1,20 +1,86 @@
 /*
- * DRIVERS.H
+ * modules.h
  *
- *  Created on: Apr 4, 2021
+ *  Created on: Apr 11, 2021
  *      Author: khaled
  */
 
-#ifndef DRIVERS_H_
-#define DRIVERS_H_
+#ifndef MODULES_H_
+#define MODULES_H_
 
 #include <string.h>
-#include "DRIVERS_CONFIG.h"
+#include "MCU_Config.h"
 #include "applib.h"
 
 
+//like LCD, blutooth, sensors [Modules Outside MCU]
+
+/*########## Module PORTS/PINS CONFIG ##########*/
 /****LED****/
-class LED : private DIO{
+#define LED0_PORT 	GPIO_PORTC
+#define LED1_PORT 	GPIO_PORTC
+#define LED2_PORT 	GPIO_PORTD
+#define LED_PIN0  	GPIO_PIN2
+#define LED_PIN1  	GPIO_PIN7
+#define LED_PIN2  	GPIO_PIN3
+#define LED_HIGH  	GPIO_HIGH
+#define LED_LOW 	GPIO_LOW
+#define LED_OUTPUT 	GPIO_OUTPUT
+/*****END******/
+
+/****LCD****/
+#define LCD_CNTRL_PORT GPIO_PORTB
+#define LCD_DATA_PORT  GPIO_PORTA
+#define LCD_RS         GPIO_PIN1
+#define LCD_RW         GPIO_PIN2
+#define LCD_EN         GPIO_PIN3
+#define LCD_DTA0       GPIO_PIN0
+#define LCD_DTA1       GPIO_PIN1
+#define LCD_DTA2       GPIO_PIN2
+#define LCD_DTA3       GPIO_PIN3
+#define LCD_DTA4       GPIO_PIN4
+#define LCD_DTA5       GPIO_PIN5
+#define LCD_DTA6       GPIO_PIN6
+#define LCD_DTA7       GPIO_PIN7
+#define LCD_LOW        GPIO_LOW
+#define LCD_HIGH       GPIO_HIGH
+#define LCD_OUTPUT     GPIO_OUTPUT
+/*****END******/
+
+/****7seg****/
+#define SEG_CNTRL_PORT GPIO_PORTB
+#define SEG_DATA_PORT  GPIO_PORTA
+#define SEG_EN1        GPIO_PIN1
+#define SEG_EN2        GPIO_PIN2
+#define SEG_DTA0_A     GPIO_PIN4
+#define SEG_DTA1_B     GPIO_PIN5
+#define SEG_DTA2_C     GPIO_PIN6
+#define SEG_DTA3_D     GPIO_PIN7
+#define SEG_OUTPUT     GPIO_OUTPUT
+#define SEG_LOW        GPIO_LOW
+#define SEG_HIGH       GPIO_HIGH
+/***********/
+
+/****KEYPAD****/
+#define KEYPAD_PORT 	GPIO_PORTC
+#define KEYPAD_ROW0 	GPIO_PIN0
+#define KEYPAD_ROW1 	GPIO_PIN1
+#define KEYPAD_ROW2 	GPIO_PIN2
+#define KEYPAD_ROW3 	GPIO_PIN3
+#define KEYPAD_COL0 	GPIO_PIN4
+#define KEYPAD_COL1 	GPIO_PIN5
+#define KEYPAD_COL2 	GPIO_PIN6
+#define KEYPAD_COL3 	GPIO_PIN7
+#define KEYPAD_INPUT	GPIO_INPUT
+#define KEYPAD_OUTPUT	GPIO_OUTPUT
+#define KEYPAD_HIGH		GPIO_HIGH
+#define KEYPAD_LOW		GPIO_LOW
+/*****END******/
+/*########## END OF SECTION ##########*/
+
+/*########## Module CLASSES ##########*/
+/****LED****/
+class LED : private GPIO{
 public :
 	void init(void){
 		set_dir(LED0_PORT, LED_PIN0, LED_OUTPUT);
@@ -65,10 +131,10 @@ public :
 		}
 	}
 };
-/***********/
+/*****END******/
 
 /****LCD****/
-class LCD : private DIO{
+class LCD : private GPIO{
 public :
 	void init(void){ //4bit mode
 	   //Define direction for control pins
@@ -161,10 +227,10 @@ public :
         }
 	}
 };
-/***********/
+/*****END******/
 
 /****7seg****/
-class SEG : private DIO {
+class SEG : private GPIO {
 public:
 	void init(void){
 		set_dir(SEG_CNTRL_PORT, SEG_EN1, SEG_OUTPUT);
@@ -193,10 +259,10 @@ public:
 		set_pin(SEG_CNTRL_PORT, SEG_EN2, SEG_LOW);
 	}
 };
-/***********/
+/*****END******/
 
 /****KEYPAD****/
-class KEYPAD : private DIO{
+class KEYPAD : private GPIO{
 public:
 	void init (void){
 		set_dir(KEYPAD_PORT, KEYPAD_COL0, KEYPAD_OUTPUT);
@@ -301,71 +367,6 @@ public:
 	}
 
 };
-/***********/
-
-/****UART****/
-class UART{
-public:
-	void init(void){
-	        Uint16t UBRR_Val = 0;//Baud rate value
-	        UCSRB = (1 << RXEN) | (1 << TXEN);//enable transmitter and reciver
-	        UCSRC = (1 << URSEL) | (1 << UCSZ1) | (1 << UCSZ0);//full config for UART
-	        //Baud Rate Calculations
-	        UBRR_Val = (((FRQ) / (16 * BAUDRATE)) - 1);
-	        //set baud rate [16bit register]
-	        UBRRL = UBRR_Val;
-	        UBRRH = UBRR_Val >> 8;
-	}
-	void init(Uint32t baud_rate){
-			Uint16t UBRR_Val = 0;//Baud rate value
-			UCSRB = (1 << RXEN) | (1 << TXEN);//enable transmitter and reciver
-			UCSRC = (1 << URSEL) | (1 << UCSZ1) | (1 << UCSZ0);//full config for UART
-			//Baud Rate Calculations
-			UBRR_Val = (((FRQ) / (16 * (baud_rate/100))) - 1);
-			//set baud rate [16bit register]
-			UBRRL = UBRR_Val;
-			UBRRH = UBRR_Val >> 8;
-	}
-	void transmit(Uint8t data){
-	        UDR = data;
-	        while(GET_BIT(UCSRA, TXC) != 1);
-	}
-	Uint8t receive(void){
-	        while(GET_BIT(UCSRA, RXC) != 1);
-	        return UDR;
-	}
-};
-/***********/
-
-/****ADC****/
-class ANALOG{
-public :
-public:
-	void init (void){
-	 CLR_BIT(ADMUX , REFS1 );SET_BIT(ADMUX , REFS0 );
-
-	 CLR_BIT(ADMUX , ADLAR );
-
-	 CLR_BIT(ADMUX , MUX4 );CLR_BIT(ADMUX , MUX3 );CLR_BIT(ADMUX , MUX2 );CLR_BIT(ADMUX , MUX1 );CLR_BIT(ADMUX , MUX0 );
-	 /*
-	 ADMUX = 0b01000001;
-	 ADMUX = 0x41;
-	 ADMUX |= (1 << REFS0) | (1 << MUX0);
-	  */
-	 SET_BIT(ADCSRA , ADEN);
-	 SET_BIT(ADCSRA , ADATE);
-	 SET_BIT(ADCSRA , ADPS0);SET_BIT(ADCSRA , ADPS1);SET_BIT(ADCSRA , ADPS0);
-
-	}
-
-	Uint16t read (void){
-	        Uint16t var = 0 ;
-	        SET_BIT(ADCSRA , ADSC);
-	        while (GET_BIT(ADCSRA,ADIF) !=1 );
-	        var = ADC;
-	        return var;
-	}
-};
-/***********/
-#endif /* DRIVERS_H_ */
-
+/*****END******/
+/*########## END OF SECTION ##########*/
+#endif /* MODULES_H_ */
