@@ -316,6 +316,16 @@ public:
 	        UBRRL = UBRR_Val;
 	        UBRRH = UBRR_Val >> 8;
 	}
+	void init(Uint32t baud_rate){
+			Uint16t UBRR_Val = 0;//Baud rate value
+			UCSRB = (1 << RXEN) | (1 << TXEN);//enable transmitter and reciver
+			UCSRC = (1 << URSEL) | (1 << UCSZ1) | (1 << UCSZ0);//full config for UART
+			//Baud Rate Calculations
+			UBRR_Val = (((FRQ) / (16 * (baud_rate/100))) - 1);
+			//set baud rate [16bit register]
+			UBRRL = UBRR_Val;
+			UBRRH = UBRR_Val >> 8;
+	}
 	void transmit(Uint8t data){
 	        UDR = data;
 	        while(GET_BIT(UCSRA, TXC) != 1);

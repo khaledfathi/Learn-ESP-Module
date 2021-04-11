@@ -4,61 +4,41 @@
  *  Created on: Apr 4, 2021
  *      Author: khaled
  */
-#include "DRIVERS.h"
-#include "applib.h"
 #include <string.h>
+#include "DRIVERS.h"
+#include "UI.h"
 
-LCD lcd ;
-LED led;
-UART serial;
 
+char password[] = "00000";
+Uint8t state_machine = 0;
+
+LCD lcd;
+KEYPAD buttons;
 int main (){
 	lcd.init();
-	led.init();
-	serial.init();
-	Uint8t data=0;
+	buttons.init();
+
+	lcd.write_string((Uint8t*) "ADMIN PASSWORD :");
+	lcd.cursor_position(1, 2);
 	while(true){
-		if (serial.receive()=='c'){
-			if (serial.receive()=='o'){
-				if (serial.receive()=='m'){
-					data= serial.receive();
-				}
+
+		/********** Check Auth **********/
+		if (state_machine==0){//right password
+			if (read_auth(password, &lcd, &buttons)){
+				lcd.clear();
+				lcd.write_string((Uint8t*)"Login Successfully");
+				_delay_ms(2000);
+				state_machine = 1;
+			}else { //wrong password
+				lcd.clear();
+				lcd.write_string((Uint8t*)"Wrong Password");
+				_delay_ms(2000);
+				lcd.clear();
+				lcd.write_string((Uint8t*) "ADMIN PASSWORD :");
+				lcd.cursor_position(1, 2);
 			}
 		}
-		if(data){
-			switch(data){
-			case 'A':
-				led.action("0", "ON");
-				lcd.clear();
-				lcd.write_character(data);
-			break;
-			case 'a' :
-				led.action("0", "OFF");
-				lcd.clear();
-				lcd.write_character(data);
-			break;
-			case 'B':
-				led.action("1", "ON");
-				lcd.clear();
-				lcd.write_character(data);
-			break;
-			case 'b':
-				led.action("1", "OFF");
-				lcd.clear();
-				lcd.write_character(data);
-			break;
-			case 'C':
-				led.action("2", "ON");
-				lcd.clear();
-				lcd.write_character(data);
-			break;
-			case 'c':
-				led.action("2", "OFF");
-				lcd.clear();
-				lcd.write_character(data);
-			break;
-			}
-		}
-		data=0;
+		/**********END**********/
+
 	}
 }
