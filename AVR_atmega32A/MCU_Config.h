@@ -36,7 +36,6 @@ typedef double Dint64t;
 #define TGL_PORT(REG) 			 REG ^= 0xFF
 /********** END **********/
 
-
 /********** PORT/PIN/STATUS RENAMING **********/
 #define GPIO_PORTA	0
 #define GPIO_PORTB	1
@@ -53,7 +52,7 @@ typedef double Dint64t;
 #define GPIO_LOW 	0
 #define GPIO_HIGH 	1
 #define GPIO_INPUT 	0
-#define GPIO_OUTPUT 	1
+#define GPIO_OUTPUT 1
 /********** END **********/
 
 /********** GPIO CONFIG CLASS **********/
@@ -206,7 +205,6 @@ public :
 			PORTD = (data<< 4) | (PORTA & 0x0F);
 		break;
 		}
-
 	}
 };
 /********** END **********/

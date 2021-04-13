@@ -10,9 +10,14 @@
 
 #include "MCU_Config.h"
 
+
 //expo integer
 //Parameter : base = number , power = expo number
 Uint32t expo (Uint8t base , Uint8t power);
+
+//convert string to digit [0~9]
+//Parameter : str = array of char
+Uint8t dig_char2dig_number(char char_);
 
 //convert integer to string
 //Parameter : org_num = unsigned number

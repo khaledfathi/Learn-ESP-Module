@@ -18,6 +18,10 @@ Uint32t expo (Uint8t base , Uint8t power){
 	}
 	return res;
 }
+Uint8t dig_char2dig_number (char char_){
+	return char_-48;
+}
+
 Uint8t* int2str (Uint32t org_num){
 	//counting digits
 	Uint32t num = org_num ;
